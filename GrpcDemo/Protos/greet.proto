@@ -19,3 +19,27 @@ message HelloRequest {
 message HelloReply {
   string message = 1;
 }
+
+service ExampleService {
+  /* 这个很想 mvc 控制器中的 action
+     但是有一个很大的不同就是 grpc 的方法不能将请求的各个部分绑定到方法对应的参数
+  */
+  // 一元
+  rpc UnaryCall (ExampleRequest) returns (ExampleResponse);
+  // 服务端流
+  rpc StreamingFromService (ExampleRequest) returns (stream ExampleResponse);
+  // 客户端流
+  rpc StreamingFromClient (stream ExampleRequest) returns (ExampleResponse);
+  // 双向绑定流
+  rpc StreamingBothWays (stream ExampleRequest) returns (stream ExampleResponse);
+}
+
+message ExampleRequest {
+  int pageIndex = 1;
+  int pageSize = 2;
+  bool isDescending = 3;
+}
+
+message ExampleResponse {
+
+}
