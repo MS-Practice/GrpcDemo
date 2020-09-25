@@ -1,4 +1,8 @@
 syntax = "proto3";
+import "google/protobuf/duration.proto";    // 对应 .NET 时间格式，Timespan
+import "google/protobuf/timestamp.proto";   // 对应 .NET 时间格式，DateTimeOffset、DateTime
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/any.proto"; // Any 包装任何类
 
 option csharp_namespace = "GrpcDemo";
 
@@ -26,8 +30,11 @@ service ExampleService {
   */
   // 一元
   rpc UnaryCall (ExampleRequest) returns (ExampleResponse);
-  // 服务端流
-  rpc StreamingFromService (ExampleRequest) returns (stream ExampleResponse);
+  /* 服务端流
+  * 对于连续的流，如果客户端不再需要，那么可以进行取消操作
+  * 客户端就会发送一个信号通知服务操作取消，调用 ServerCallContext.CancellationToken 触发。
+  */ 
+  rpc StreamingFromServer (ExampleRequest) returns (stream ExampleResponse);
   // 客户端流
   rpc StreamingFromClient (stream ExampleRequest) returns (ExampleResponse);
   // 双向绑定流
@@ -35,11 +42,31 @@ service ExampleService {
 }
 
 message ExampleRequest {
-  int pageIndex = 1;
-  int pageSize = 2;
+  int32 pageIndex = 1;
+  int32 pageSize = 2;
   bool isDescending = 3;
 }
 
 message ExampleResponse {
 
+}
+
+message Meeting {
+    string subject = 1;
+    google.protobuf.Timestamp start = 2;
+    google.protobuf.Duration duration = 3;
+}
+
+// 可空类型
+message PersonNullale {
+    google.protobuf.Int32Value age = 5; // 对应 int?
+}
+
+message ListType {
+    repeated string roles = 1;  // 对应集合类,生成 RepeatedField<T>,它派生自 IList<T>
+}
+
+message Status {
+    string message = 1;
+    google.protobuf.Any detail = 2;
 }

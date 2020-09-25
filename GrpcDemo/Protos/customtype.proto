@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package CustomTypes;
+
+/* 目前 protobuf 没有定义 decimal 格式类型
+* 所以要自己新等一个类代表它是 decimal 类型
+* 在客户端和服务端接收这种类型就要对应的去处理它
+*/ 
+// example 12345.6789 => { units = 12345, nanos = 67890000}
+message DecimalValue {
+	// 整数部分
+	int64 units = 1;
+	// 纳米单位(10^-9),也就是左移 9 位
+	// 单位是必须相同的符号
+	sfixed32 nanos = 2;	
+}
+
+/*
+* nanos 字段代表 0.999_999_999 到 -0.999_999_999,例如 1.5m 代表的就是 { units = 1, nanos = 500000000 } 
+* 对于较大的值,所以才会用 sfixed 更有效
+*/
